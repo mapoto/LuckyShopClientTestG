@@ -13,4 +13,5 @@ Very simple interaction where a customer orders a set of product available from 
 - [x] Project setup (database creation, MVVM structures, WPF UI setup)
 - [x] Orders functions
 - [ ] Login features for existing customer
+- [ ] Input validations
 - [ ] Add GitHub action
