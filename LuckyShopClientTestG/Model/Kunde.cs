@@ -8,7 +8,9 @@ namespace LuckyShopClientTestG.Model
 {
     public class Kunde
     {
-        public string KundenID { get; set; }
+        /*Hashed Email Adress*/
+        public string KundenID { get; set; }       
+
         public string Name { get; set; }
         public string Adresse { get; set; }
 

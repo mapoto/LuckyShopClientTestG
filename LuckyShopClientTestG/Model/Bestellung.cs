@@ -12,12 +12,16 @@ namespace LuckyShopClientTestG.Model
         public string BestellID { get; set; }
         public List<string> Produkte { get; set; }
         public decimal Gesamtsumme { get; set; }
+        public string KundenID { get; set; }
 
-        public Bestellung(string BestellID, List<string> Produkte, decimal Gesamtsumme)
+        // TODO: needs to have Versandadresse
+
+        public Bestellung(string BestellID, List<string> Produkte, decimal Gesamtsumme, string KundenID)
         {
             this.BestellID = BestellID;
             this.Produkte = Produkte;
             this.Gesamtsumme = Gesamtsumme;
+            this.KundenID = KundenID;
         }
 
         public override bool Equals(Object obj)

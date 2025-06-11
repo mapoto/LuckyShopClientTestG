@@ -1,7 +1,10 @@
 {
-  "serverName": "database-1.cf6yakakw3yl.eu-central-1.rds.amazonaws.com",
-  "port": "1435",
-  "databaseName": "question_db",
-  "userName": "admin",
-  "password": "m0niG3ndut!!"
+  "DataSource": "(localdb)\\MSSQLLocalDB;Initial",
+  "Catalog": "master",
+  "Integrated Security": "True",
+  "Connect Timeout": "30",
+  "Encrypt": "False",
+  "Trust Server Certificate": "False",
+  "Application Intent": "ReadWrite",
+  "Multi Subnet Failover":"False"
 }

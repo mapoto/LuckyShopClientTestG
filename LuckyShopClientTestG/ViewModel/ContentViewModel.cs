@@ -9,6 +9,7 @@ using System.Windows.Input;
 using LuckyShopClientTestG.Model;
 using LuckyShopClientTestG.MVVM;
 using LuckyShopClientTestG.View;
+using Microsoft.Identity.Client;
 
 
 namespace LuckyShopClientTestG.ViewModel
@@ -209,14 +210,27 @@ namespace LuckyShopClientTestG.ViewModel
 
         private void Bestellen()
         {
-            currentBestellung = new Bestellung(BestellID: GenerateOrderId(), Produkte: Warenkorb.Select(x=>x.ProduktID).ToList(), Gesamtsumme: WarenkorbSumme);
-            ConnectorSQL.BestellungAufnehmen(currentBestellung);
+            string customerHash = GetCustomerHash();
+
+            Kunde currentKunde = new Kunde(KundenID: customerHash, Name: currentName, Adresse: currentAdresse);
+
+            currentBestellung = new Bestellung(BestellID: GenerateOrderId(customerHash), 
+                Produkte: Warenkorb.Select(x=>x.ProduktID).ToList(), 
+                Gesamtsumme: WarenkorbSumme, 
+                KundenID: customerHash);
+
+            // Lazy implementation. ToDo : make a proper  check for existing customer
+            ConnectorSQL.BestellungAufnehmen(currentKunde, currentBestellung);
         }
 
-        private string GenerateOrderId()
+        private string GetCustomerHash()
+        {
+            return CurrentEmail.GetHashCode().ToString("X");
+
+        }
+        private string GenerateOrderId(string customerHash)
         {
             // Use a short hash of the customer ID for privacy and length
-            string customerHash = CurrentEmail.GetHashCode().ToString("X");
             string timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
             string random = Guid.NewGuid().ToString("N").Substring(0, 6); // 6-char random string
 

@@ -133,7 +133,7 @@ public class ConnectAPI
         FetchList();
     }
 
-    public void BestellungAufnehmen(Bestellung bestellung)
+    public void BestellungAufnehmen(Kunde kunde, Bestellung bestellung)
     {
 
         if (!isConnected)
@@ -151,6 +151,13 @@ public class ConnectAPI
             
         }
 
+
+        using (SqlCommand command = BuildKundenUpdateQuery(kunde))
+        {
+            _ = command.ExecuteNonQuery();
+        }
+
+        // Create or update the customer table. ToDo: Add proper login for existing customer and create new entry for customer.
 
         using (SqlCommand command = BuildBestellungenInsertQuery(bestellung))
         {
@@ -195,44 +202,43 @@ public class ConnectAPI
     {
         SqlCommand command = new SqlCommand(
             $"INSERT INTO {orderTableName} " +
-            $"(BestellID,Produkte,Gesamtsumme) " +
-            $"SELECT @BestellID,@Produkte,@Gesamtsumme");
+            $"(BestellID,Produkte,Gesamtsumme,KundenID) " +
+            $"SELECT @BestellID,@Produkte,@Gesamtsumme,@KundenID");
 
         command.Parameters.AddWithValue("@BestellID", bestellung.BestellID);
         command.Parameters.AddWithValue("@Produkte", String.Join(";", bestellung.Produkte));
         command.Parameters.AddWithValue("@Gesamtsumme", bestellung.Gesamtsumme);
+        command.Parameters.AddWithValue("@KundenID", bestellung.KundenID);
+
         command.Connection = connection;
 
         return command;
 
     }
 
-    //private SqlCommand BuildUpdateQuery(Produkt updated)
-    //{
+    private SqlCommand BuildKundenUpdateQuery(Kunde entry)
+    {
+
+        string k_tableName = "Kunden";
+        SqlCommand command = new SqlCommand($"UPDATE {k_tableName} " +
+            "SET KundenID= @KundenID , " +
+            "Adresse= @Adresse , " +
+            "Name= @Name " +
+            "WHERE KundenID= @KundenID;" +
+            $"IF NOT EXISTS(SELECT 1 FROM {k_tableName} WHERE KundenID = @KundenID) " +
+            $"BEGIN " +
+            $"INSERT INTO {k_tableName} (KundenID,Adresse,Name) " +
+            "SELECT @KundenID,@Adresse,@Name " +
+            "END", connection);
+
+        command.Parameters.AddWithValue("@KundenID", entry.KundenID);
+        command.Parameters.AddWithValue("@Adresse", entry.Adresse);
+        command.Parameters.AddWithValue("@Name", entry.Name);
 
 
-    //    SqlCommand command = new SqlCommand($"UPDATE {tableName} " +
-    //        "SET date= @date , " +
-    //        "question= @question , " +
-    //        "choices= @choices , " +
-    //        "solution = @solution " +
-    //        "WHERE id = @id;" +
-    //        $"IF NOT EXISTS(SELECT 1 FROM {tableName} WHERE id = @id) " +
-    //        $"BEGIN " +
-    //        $"INSERT INTO {tableName} (id,date,question,choices,solution) " +
-    //        "SELECT @id,@date,@question,@choices,@solution " +
-    //        "END", connection);
+        return command;
 
-    //    command.Parameters.AddWithValue("@date", updated.Date);
-    //    command.Parameters.AddWithValue("@question", updated.Question);
-    //    command.Parameters.AddWithValue("@choices", string.Join(";", updated.Choices));
-    //    command.Parameters.AddWithValue("@solution", updated.Solution);
-    //    command.Parameters.AddWithValue("@id", updated.Id);
-
-
-    //    return command;
-
-    //}
+    }
 
     //private SqlCommand BuildDeleteQuery(Produkt item)
     //{
